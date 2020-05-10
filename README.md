@@ -5,6 +5,6 @@ The SR04_SerialComms.ino sketch file uses a ultrasonic sensor to measure distanc
 
 The RxTxForm.java file does all the USB communication from the PC.
 
-Java RTE and Arduino USB drivers are required to make this work.
-
 Some of the other files are for Eclipse IDE and jSerialComm.
+
+Java RTE and Arduino USB drivers are required to make this work.
