@@ -1,5 +1,5 @@
 # ArduinoSerialComms
-Communication between Arduino Uno and PC using serial communication.
+Communication between Arduino Uno and PC using serial communication.  Very similiar to the serial monitor that comes with Arduino but this method gives a person a starting point for generating there own source (Java) code program.
 
 The SR04_SerialComms.ino file uses a ultrasonic sensor to measure distance.
 
