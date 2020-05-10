@@ -1,2 +1,4 @@
 # ArduinoSerialComms
-Communication between Arduino Uno and PC using serial communication
+Communication between Arduino Uno and PC using serial communication.
+
+Testing
