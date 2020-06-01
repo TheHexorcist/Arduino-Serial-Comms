@@ -23,7 +23,7 @@ import javax.swing.JTextArea;
 import java.awt.Font;
 import javax.swing.JScrollPane;
 
-public class RxTxForm extends JFrame implements KeyListener, WindowListener, SerialPortMessageListener {
+public class RxTxForm_050620 extends JFrame implements KeyListener, WindowListener, SerialPortMessageListener {
 
 	/**
 	 * 
@@ -41,7 +41,7 @@ public class RxTxForm extends JFrame implements KeyListener, WindowListener, Ser
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					RxTxForm frame = new RxTxForm();
+					RxTxForm_050620 frame = new RxTxForm_050620();
 					frame.setVisible(true);
 					
 				} catch (Exception e) {
@@ -57,7 +57,7 @@ public class RxTxForm extends JFrame implements KeyListener, WindowListener, Ser
 	/**
 	 * Create the frame.
 	 */
-	public RxTxForm() {
+	public RxTxForm_050620() {
 		setTitle("RxTx Communication");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -82,15 +82,12 @@ public class RxTxForm extends JFrame implements KeyListener, WindowListener, Ser
 		searchPorts();
 		
 		if (comPort != null) {
-			textArea.append("press the 'r' key to receive response\n");
 			comPort.openPort();		
 			comPort.addDataListener(this);
 		} else {
 			removeKeyListener(this);
 			removeWindowListener(this);
-			textArea.append("connection error\n");
-			textArea.append("no Arduino Uno device found:\n");
-			textArea.append("insure Arduino USB drivers are installed\n");
+			textArea.append("connection error");
 		}
 	}
 
@@ -116,11 +113,10 @@ public class RxTxForm extends JFrame implements KeyListener, WindowListener, Ser
 	public void serialEvent(SerialPortEvent EventcomPort) {
 		// TODO Auto-generated method stub
 
+		byte[] readBuffer = EventcomPort.getReceivedData();
+		String strreadBuffer="";
 		try {
-			byte[] readBuffer = EventcomPort.getReceivedData();
-			String strreadBuffer="";
 			strreadBuffer = new String(readBuffer, "UTF-8");
-			textArea.append(strreadBuffer);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -128,6 +124,7 @@ public class RxTxForm extends JFrame implements KeyListener, WindowListener, Ser
 			e.printStackTrace(new PrintWriter(stackTraceWriter));
 			textArea.append(e.toString() + "\n" + stackTraceWriter.toString());
 		}
+		textArea.append(strreadBuffer);
 	}
 	
 	@Override
@@ -200,11 +197,35 @@ public class RxTxForm extends JFrame implements KeyListener, WindowListener, Ser
 		comPorts = SerialPort.getCommPorts();
 		
 		for (SerialPort i : comPorts) {
-			if (i.getDescriptivePortName().contains("Arduino Uno")) {
-				comPort = i;
-			}			
+			authenticate(i);
 		}
-		
+			
 	}
 	
+	private void authenticate(SerialPort comPort) {
+		int numbtries = 3;
+		comPort.openPort();
+		//boolean PortnotFound = True;
+		
+		try {
+			for (int i = 0; i < numbtries; i++) {
+				comPort.writeBytes("uno\n".getBytes(), "uno\n".length());
+				Thread.sleep(500);
+				byte[] readBuffer = new byte[comPort.bytesAvailable()];
+				comPort.readBytes(readBuffer, readBuffer.length);
+				String strreadBuffer = new String(readBuffer, "UTF-8");
+				if(strreadBuffer.contentEquals("uno\r\n"))
+					this.comPort=comPort;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			StringWriter stackTraceWriter = new StringWriter();
+			e.printStackTrace(new PrintWriter(stackTraceWriter));
+			textArea.append(e.toString() + "\n" + stackTraceWriter.toString());
+		}
+		
+		comPort.closePort();
+		
+	}
 }
